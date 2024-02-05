@@ -14,7 +14,7 @@ import mirror.normalasm.proxy.CommonProxy;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-@Mod(modid = "normalasm", name = "NormalASM", version = NormalLoadingPlugin.VERSION, dependencies = "after:jei")
+@Mod(modid = "normalasm", name = "FermiumASM", version = NormalLoadingPlugin.VERSION, dependencies = "after:jei")
 public class NormalASM {
 
     @SidedProxy(modId = "normalasm", clientSide = "mirror.normalasm.proxy.ClientProxy", serverSide = "mirror.normalasm.proxy.CommonProxy")

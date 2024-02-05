@@ -1,14 +1,14 @@
 [
 {
   "modid": "normalasm",
-  "name": "NormalASM",
-  "description": "NormalASM has bytecode manipulated your game.",
+  "name": "FermiumASM",
+  "description": "FermiumASM has bytecode manipulated your game.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "https://github.com/mirrorcult/NormalASM",
+  "url": "https://github.com/fonnymunkey/FermiumASM",
   "updateUrl": "",
-  "authorList": ["Rongmario"],
-  "logoFile": "assets/normalasm/normalasm.png",
+  "authorList": ["Rongmario", "mirrorcult", "skmedix", "fonnymunkey"],
+  "logoFile": "assets/normalasm/fermiumasm.png",
   "screenshots": [],
   "dependencies": []
 }

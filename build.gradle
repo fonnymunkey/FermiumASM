@@ -144,7 +144,7 @@ dependencies {
 }
 
 mixin {
-    add sourceSets.main, 'mixins.' + project.archives_base_name + '.refmap.json'
+    add sourceSets.main, 'mixins.' + 'normalasm' + '.refmap.json'
 }
 
 processResources {
