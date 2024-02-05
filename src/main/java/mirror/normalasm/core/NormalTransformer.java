@@ -28,7 +28,7 @@ public class NormalTransformer implements IClassTransformer {
     Multimap<String, Function<byte[], byte[]>> transformations;
 
     public NormalTransformer() {
-        NormalLogger.instance.info("NormalASM is now preparing to bytecode manipulate your game.");
+        NormalLogger.instance.info("FermiumASM is now preparing to bytecode manipulate your game.");
         isOptifineInstalled = NormalReflector.doesClassExist("optifine.OptiFineForgeTweaker");
         if (squashBakedQuads && isOptifineInstalled) {
             squashBakedQuads = false;

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-@IFMLLoadingPlugin.Name("NormalASM")
+@IFMLLoadingPlugin.Name("FermiumASM")
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
 public class NormalLoadingPlugin implements IFMLLoadingPlugin {
 
@@ -40,8 +40,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
     public static final boolean isClient = FMLLaunchHandler.side() == Side.CLIENT;
 
     public NormalLoadingPlugin() {
-        NormalLogger.instance.info("NormalASM is on the {}-side.", isClient ? "client" : "server");
-        NormalLogger.instance.info("NormalASM is preparing and loading in mixins");
+        NormalLogger.instance.info("FermiumASM is on the {}-side.", isClient ? "client" : "server");
+        NormalLogger.instance.info("FermiumASM is preparing and loading in mixins");
         if (NormalConfig.instance.outdatedCaCertsFix) {
             try (InputStream is = this.getClass().getResource("/cacerts").openStream()) {
                 File cacertsCopy = File.createTempFile("cacerts", "");
@@ -90,22 +90,22 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
                     }
                 }
                 if (needToDGSFFFF) {
-                    NormalLogger.instance.fatal("NormalASM notices that you're using Eclipse OpenJ9 {}!", SystemUtils.JAVA_VERSION);
+                    NormalLogger.instance.fatal("FermiumASM notices that you're using Eclipse OpenJ9 {}!", SystemUtils.JAVA_VERSION);
                     NormalLogger.instance.fatal("This OpenJ9 version is outdated and contains a critical bug: https://github.com/eclipse-openj9/openj9/issues/8353");
                     NormalLogger.instance.fatal("Either use '-Xjit:disableGuardedStaticFinalFieldFolding' as part of your java arguments, or update OpenJ9!");
                 }
             }
         }
 
-        NormalLogger.instance.info("NormalASM enqueueing early mixins");
+        NormalLogger.instance.info("FermiumASM enqueueing early mixins");
         for(String config : earlyList) {
             FermiumRegistryAPI.enqueueMixin(false, config, () -> shouldMixinConfigQueueEarly(config));
         }
-        NormalLogger.instance.info("NormalASM enqueueing late mixins");
+        NormalLogger.instance.info("FermiumASM enqueueing late mixins");
         for(String config : lateList) {
             FermiumRegistryAPI.enqueueMixin(true, config, () -> shouldMixinConfigQueueLate(config));
         }
-        NormalLogger.instance.info("NormalASM finished mixin enqueue");
+        NormalLogger.instance.info("FermiumASM finished mixin enqueue");
     }
 
     @Override
