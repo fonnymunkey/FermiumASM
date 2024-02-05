@@ -67,9 +67,6 @@ repositories {
         url 'https://repo.spongepowered.org/maven'
     }
     maven {
-        url 'https://maven.cleanroommc.com'
-    }
-    maven {
         url 'http://chickenbones.net/maven'
         allowInsecureProtocol = true
     }
@@ -105,7 +102,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     embed 'me.nallar.whocalled:WhoCalled:1.1'
-    implementation 'zone.rong:mixinbooter:7.1'
+    implementation fg.deobf('curse.maven:fermiumbooter-968474:5067768')
     implementation files('./etc/spark-forge-deobf.jar')
 
     compileOnly 'com.enderio.core:EnderCore:1.12.2-+'
