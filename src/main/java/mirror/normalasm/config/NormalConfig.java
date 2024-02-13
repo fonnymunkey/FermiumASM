@@ -61,7 +61,7 @@ public class NormalConfig {
 
     private Configuration configuration;
 
-    public boolean squashBakedQuads, logClassesThatCallBakedQuadCtor, reuseBucketQuads;
+    public boolean squashBakedQuads, logClassesThatCallBakedQuadCtor, reuseBucketQuads, autoPopulateCallBakedQuadCtor, autoPopulateExtendBakedQuad;
     public String[] classesThatCallBakedQuadCtor, classesThatExtendBakedQuad;
     public boolean cleanupLaunchClassLoaderEarly, cleanupLaunchClassLoaderLate, noResourceCache, noClassCache, weakResourceCache, weakClassCache, disablePackageManifestMap, cleanCachesOnGameLoad/*, cleanCachesOnWorldLoad*/;
     public boolean resourceLocationCanonicalization, modelConditionCanonicalization, nbtTagStringBackingStringCanonicalization, nbtBackingMapStringCanonicalization, packageStringCanonicalization, lockCodeCanonicalization, spriteNameCanonicalization, asmDataStringCanonicalization, vertexDataCanonicalization, filePermissionsCacheCanonicalization;
@@ -77,6 +77,7 @@ public class NormalConfig {
     public boolean furnaceExperienceFCFS, furnaceExperienceVanilla, furnaceExperienceMost;
     public boolean makeEventsSingletons;
     public boolean crashReportImprovements, returnToMainMenuAfterCrash, rewriteLoggingWithDeobfuscatedNames, hideToastsAndContinuePlaying;
+    public String vanityDeobfuscationName;
 
     private void initialize() {
         configuration = new Configuration(new File(Launch.minecraftHome, "config" + File.separator + "normalasm.cfg"));
@@ -89,6 +90,8 @@ public class NormalConfig {
         classesThatExtendBakedQuad = getStringArray("classesThatExtendBakedQuad", "bakedquad", "Classes that extend BakedQuad need to be handled separately. This should be done automatically, while the changes will show in the next launch", "");
         logClassesThatCallBakedQuadCtor = getBoolean("logClassesThatCallBakedQuadCtor", "bakedquad", "Log classes that need their BakedQuad::new calls redirected", true);
         reuseBucketQuads = getBoolean("reuseBucketQuads", "bakedquad", "Allows bucket models to re-use UnpackedBakedQuads", true);
+        autoPopulateCallBakedQuadCtor = getBoolean("autoPopulateCallBakedQuadCtor", "bakedquad", "If disabled, will stop classesThatCallBakedQuadCtor from being automatically populated, for compatibility purposes", true);
+        autoPopulateExtendBakedQuad = getBoolean("autoPopulateExtendBakedQuad", "bakedquad", "If disabled, will stop classesThatExtendBakedQuad from being automatically populated, for compatibility purposes", true);
 
         cleanupLaunchClassLoaderEarly = getBoolean("cleanupLaunchClassLoaderEarly", "launchwrapper", "Cleanup some redundant data structures in LaunchClassLoader at the earliest point possible (when NormalASM is loaded). Helpful for those that don't have enough RAM to load into the game. This can induce slowdowns while loading the game in exchange for more available RAM", false);
         cleanupLaunchClassLoaderLate = getBoolean("cleanupLaunchClassLoaderLate", "launchwrapper", "Cleanup some redundant data structures in LaunchClassLoader at the latest point possible (when the game reaches the Main Screen). This is for those that have enough RAM to load the game and do not want any slowdowns while loading. Note: if 'cleanupLaunchClassLoaderEarly' is 'true', this option will be ignored", true);
@@ -180,11 +183,13 @@ public class NormalConfig {
         returnToMainMenuAfterCrash = getBoolean("returnToMainMenuAfterCrash", "logging", "When crashReportImprovements is true, allow the player to return to the main menu when a crash occurs, inspired by VanillaFix", true);
         rewriteLoggingWithDeobfuscatedNames = getBoolean("rewriteLoggingWithDeobfuscatedNames", "logging", "Rewrite logging output with deobfuscated names when applicable, inspired by VanillaFix", true);
         hideToastsAndContinuePlaying = getBoolean("hideToastsAndContinuePlaying", "logging", "When crashReportImprovements is true, disallow toasts from popping up and carry on playing while keeping crashes silent", true);
+        vanityDeobfuscationName = getString("vanityDeobfuscationName", "logging", "When crashReportImprovements is true, allows changing the name of what deobfuscated the stacktrace", "FermiumASM");
 
         configuration.save();
     }
 
     public void editClassesThatCallBakedQuadCtor(Class<?> clazz) {
+        if(!NormalConfig.instance.autoPopulateCallBakedQuadCtor) return;
         Property prop = configuration.getCategory("bakedquad").get("classesThatCallBakedQuadCtor");
         Set<String> classes = new ObjectOpenHashSet<>(prop.getStringList());
         if (classes.add(clazz.getName())) {
@@ -195,6 +200,7 @@ public class NormalConfig {
     }
 
     public void editClassesThatExtendBakedQuad(Class<?> clazz) {
+        if(!NormalConfig.instance.autoPopulateExtendBakedQuad) return;
         Property prop = configuration.getCategory("bakedquad").get("classesThatExtendBakedQuad");
         Set<String> classes = new ObjectOpenHashSet<>(prop.getStringList());
         if (classes.add(clazz.getName())) {
@@ -216,6 +222,12 @@ public class NormalConfig {
         return newValues;
     }
 
+    private String setString(String name, String category, String value) {
+        Property prop = configuration.getCategory(category).get(name);
+        prop.set(value);
+        return value;
+    }
+
     private boolean getBoolean(String name, String category, String description, boolean defaultValue) {
         Property prop = configuration.get(category, name, defaultValue);
         prop.setDefaultValue(defaultValue);
@@ -234,6 +246,16 @@ public class NormalConfig {
         prop.setShowInGui(true);
         prop.setLanguageKey("normalasm.config." + name);
         return prop.getStringList();
+    }
+
+    private String getString(String name, String category, String description, String defaultValue) {
+        Property prop = configuration.get(category, name, defaultValue);
+        prop.setDefaultValue(defaultValue);
+        prop.setComment(description + " - <default: " + defaultValue + ">");
+        prop.setRequiresMcRestart(true);
+        prop.setShowInGui(true);
+        prop.setLanguageKey("normalasm.config." + name);
+        return prop.getString();
     }
 
     @Deprecated

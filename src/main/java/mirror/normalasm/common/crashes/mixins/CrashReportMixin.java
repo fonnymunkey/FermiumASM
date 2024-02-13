@@ -1,5 +1,6 @@
 package mirror.normalasm.common.crashes.mixins;
 
+import mirror.normalasm.config.NormalConfig;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraftforge.fml.common.ModContainer;
@@ -74,7 +75,8 @@ public abstract class CrashReportMixin implements ICrashReportSuspectGetter {
     public String getCompleteReport() {
         StringBuilder builder = new StringBuilder();
         builder.append("---- Minecraft Crash Report ----\n")
-                .append("// FermiumASM deobfuscated this stacktrace using MCP's stable-39 mappings.\n")
+                .append("// Crash report modified by FermiumASM.\n")
+                .append("// ").append(NormalConfig.instance.vanityDeobfuscationName).append(" deobfuscated this stacktrace using MCP's stable-39 mappings.\n")
                 .append("// ").append(getWittyComment());
         builder.append("\n\n")
                 .append("Time: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date())).append("\n")
