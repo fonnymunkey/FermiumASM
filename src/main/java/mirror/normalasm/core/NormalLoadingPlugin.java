@@ -188,11 +188,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
                     return true;
                 case "mixins.fix_mc186052.json":
                     return true;
-            }
-        }
-        else {
-            if ("mixins.vfix_bugfixes.json".equals(mixinConfig)) {
-                return true;
+                case "mixins.fix_mc129556.json":
+                    return NormalConfig.instance.fixMC129556;
             }
         }
 
@@ -208,7 +205,10 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
             case "mixins.misc_fluidregistry.json":
                 return NormalConfig.instance.quickerEnableUniversalBucketCheck;
             case "mixins.forgefixes.json":
-                return NormalConfig.instance.fixFillBucketEventNullPointerException || NormalConfig.instance.fixTileEntityOnLoadCME;
+                return NormalConfig.instance.fixFillBucketEventNullPointerException ||
+                        NormalConfig.instance.fixTileEntityOnLoadCME ||
+                        NormalConfig.instance.fasterEntitySpawnPreparation ||
+                        NormalConfig.instance.fixDimensionTypesInliningCrash;
             case "mixins.capability.json":
                 return NormalConfig.instance.delayItemStackCapabilityInit;
             case "mixins.singletonevents.json":
@@ -225,6 +225,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
                 return true;
             case "mixins.vanities.json":
                 return true;
+            case "mixins.vfix_bugfixes.json":
+                return NormalConfig.instance.vfixBugFixes;
         }
 
         return false;

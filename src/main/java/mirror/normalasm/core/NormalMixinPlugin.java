@@ -34,8 +34,10 @@ public class NormalMixinPlugin implements IMixinConfigPlugin {
                 return NormalConfig.instance.fasterEntitySpawnPreparation;
             case "mirror.normalasm.common.forgefixes.mixins.DimensionTypeMixin":
                 return NormalConfig.instance.fixDimensionTypesInliningCrash;
+            case "mirror.normalasm.common.forgefixes.mixins.ForgeEventFactoryMixin":
+                return NormalConfig.instance.fixFillBucketEventNullPointerException;
             case "mirror.normalasm.client.screenshot.mixins.MinecraftMixin":
-                return NormalConfig.instance.copyScreenshotToClipboard;
+                return NormalConfig.instance.asyncScreenshot;
             case "mirror.normalasm.client.screenshot.mixins.ScreenShotHelperMixin":
                 return NormalConfig.instance.releaseScreenshotCache;
         }

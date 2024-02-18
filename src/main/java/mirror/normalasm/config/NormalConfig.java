@@ -41,7 +41,6 @@ public class NormalConfig {
                 Data oldConfig = gson.fromJson(reader, Data.class);
                 instance.squashBakedQuads = instance.setBoolean("squashBakedQuads", "bakedquad", oldConfig.bakedQuadsSquasher);
                 instance.classesThatCallBakedQuadCtor = instance.setStringArray("classesThatCallBakedQuadCtor", "bakedquad", oldConfig.bakedQuadPatchClasses);
-                instance.logClassesThatCallBakedQuadCtor = instance.setBoolean("logClassesThatCallBakedQuadCtor", "bakedquad", oldConfig.logClassesThatNeedPatching);
                 instance.cleanupLaunchClassLoaderLate = instance.setBoolean("cleanupLaunchClassLoaderLate", "launchwrapper", oldConfig.cleanupLaunchClassLoader);
                 instance.cleanupLaunchClassLoaderLate = instance.setBoolean("cleanupLaunchClassLoaderLate", "launchwrapper", oldConfig.cleanupLaunchClassLoader);
                 instance.optimizeFMLRemapper = instance.setBoolean("optimizeFMLRemapper", "remapper", oldConfig.remapperMemorySaver);
@@ -61,19 +60,19 @@ public class NormalConfig {
 
     private Configuration configuration;
 
-    public boolean squashBakedQuads, logClassesThatCallBakedQuadCtor, reuseBucketQuads, autoPopulateCallBakedQuadCtor, autoPopulateExtendBakedQuad;
+    public boolean squashBakedQuads, reuseBucketQuads, autoPopulateCallBakedQuadCtor, autoPopulateExtendBakedQuad;
     public String[] classesThatCallBakedQuadCtor, classesThatExtendBakedQuad;
-    public boolean cleanupLaunchClassLoaderEarly, cleanupLaunchClassLoaderLate, noResourceCache, noClassCache, weakResourceCache, weakClassCache, disablePackageManifestMap, cleanCachesOnGameLoad/*, cleanCachesOnWorldLoad*/;
+    public boolean cleanupLaunchClassLoaderEarly, cleanupLaunchClassLoaderLate, noResourceCache, noClassCache, weakResourceCache, weakClassCache, disablePackageManifestMap, cleanCachesOnGameLoad;
     public boolean resourceLocationCanonicalization, modelConditionCanonicalization, nbtTagStringBackingStringCanonicalization, nbtBackingMapStringCanonicalization, packageStringCanonicalization, lockCodeCanonicalization, spriteNameCanonicalization, asmDataStringCanonicalization, vertexDataCanonicalization, filePermissionsCacheCanonicalization;
     public boolean optimizeFMLRemapper;
     public boolean optimizeRegistries, optimizeNBTTagCompoundBackingMap, optimizeFurnaceRecipeStore, stripNearUselessItemStackFields, moreModelManagerCleanup, efficientHashing, replaceSearchTreeWithJEISearching;
     public boolean releaseSpriteFramesCache, onDemandAnimatedTextures;
     public boolean optimizeSomeRendering, stripUnnecessaryLocalsInRenderHelper;
-    public boolean quickerEnableUniversalBucketCheck, stripInstancedRandomFromSoundEventAccessor, classCaching, copyScreenshotToClipboard, releaseScreenshotCache, asyncScreenshot, removeExcessiveGCCalls, smoothDimensionChange, threadPriorityFix, outdatedCaCertsFix;
+    public boolean quickerEnableUniversalBucketCheck, stripInstancedRandomFromSoundEventAccessor, copyScreenshotToClipboard, releaseScreenshotCache, asyncScreenshot, removeExcessiveGCCalls, smoothDimensionChange, threadPriorityFix, outdatedCaCertsFix;
     public boolean fixBlockIEBaseArrayIndexOutOfBoundsException, cleanupChickenASMClassHierarchyManager, optimizeAmuletRelatedFunctions, labelCanonicalization, skipCraftTweakerRecalculatingSearchTrees, bwmBlastingOilOptimization, optimizeQMDBeamRenderer, repairEvilCraftEIOCompat, optimizeArcaneLockRendering, fixXU2CrafterCrash, disableXU2CrafterRendering, fixTFCFallingBlockFalseStartingTEPos;
     public boolean fixAmuletHolderCapability, delayItemStackCapabilityInit;
     public boolean fixFillBucketEventNullPointerException, fixTileEntityOnLoadCME, removeForgeSecurityManager, fasterEntitySpawnPreparation, fixDimensionTypesInliningCrash;
-    public boolean fixMC30845, fixMC31681, fixMC88176, fixMC129057, fixMC129556, fixMC186052, resolveMC2071, limitSkinDownloadingThreads;
+    public boolean fixMC30845, fixMC31681, fixMC88176, fixMC129057, fixMC129556, fixMC186052, resolveMC2071, limitSkinDownloadingThreads, vfixBugFixes;
     public boolean furnaceExperienceFCFS, furnaceExperienceVanilla, furnaceExperienceMost;
     public boolean makeEventsSingletons;
     public boolean crashReportImprovements, returnToMainMenuAfterCrash, rewriteLoggingWithDeobfuscatedNames, hideToastsAndContinuePlaying;
@@ -88,7 +87,6 @@ public class NormalConfig {
         squashBakedQuads = getBoolean("squashBakedQuads", "bakedquad", "Saves RAM by removing BakedQuad instance variables, redirecting BakedQuad creation to specific BakedQuad child classes. This will be forcefully turned off when Optifine is installed as it is incompatible", true);
         classesThatCallBakedQuadCtor = getStringArray("classesThatCallBakedQuadCtor", "bakedquad", "Classes where BakedQuad::new calls need to be redirected. As of 3.2, this should be done automatically, while the changes will show in the next launch", "net.minecraft.client.renderer.block.model.FaceBakery");
         classesThatExtendBakedQuad = getStringArray("classesThatExtendBakedQuad", "bakedquad", "Classes that extend BakedQuad need to be handled separately. This should be done automatically, while the changes will show in the next launch", "");
-        logClassesThatCallBakedQuadCtor = getBoolean("logClassesThatCallBakedQuadCtor", "bakedquad", "Log classes that need their BakedQuad::new calls redirected", true);
         reuseBucketQuads = getBoolean("reuseBucketQuads", "bakedquad", "Allows bucket models to re-use UnpackedBakedQuads", true);
         autoPopulateCallBakedQuadCtor = getBoolean("autoPopulateCallBakedQuadCtor", "bakedquad", "If disabled, will stop classesThatCallBakedQuadCtor from being automatically populated, for compatibility purposes", true);
         autoPopulateExtendBakedQuad = getBoolean("autoPopulateExtendBakedQuad", "bakedquad", "If disabled, will stop classesThatExtendBakedQuad from being automatically populated, for compatibility purposes", true);
@@ -101,7 +99,6 @@ public class NormalConfig {
         weakClassCache = getBoolean("weakClassCache", "launchwrapper", "Weaken the caching of classes. This allows the GC to free up more space when the caches are no longer needed. If 'noClassCache' is 'true', this option will be ignored", true);
         disablePackageManifestMap = getBoolean("disablePackageManifestMap", "launchwrapper", "Disable the unusused Package Manifest map. This option coincides with Foamfix's 'removePackageManifestMap' option", true);
         cleanCachesOnGameLoad = getBoolean("cleanCachesOnGameLoad", "launchwrapper", "Invalidate and clean cache entries when the game finishes loading (onto the main screen). Loading into the first world may take longer. This option wouldn't do anything if 'cleanupLaunchClassLoaderLate' is 'true'", false);
-        // cleanCachesOnWorldLoad = getBoolean("cleanCachesOnWorldLoad", "launchwrapper", "Invalidate and clean cache entries when you load into a world, whether that be loading into a singleplayer world or a multiplayer server.", true);
 
         resourceLocationCanonicalization = getBoolean("resourceLocationCanonicalization", "canonicalization", "Deduplicate ResourceLocation and ModelResourceLocation instances", true);
         modelConditionCanonicalization = getBoolean("modelConditionCanonicalization", "canonicalization", "Deduplicate Model Conditions. Enable this if you do not have Foamfix installed", false);
@@ -116,7 +113,6 @@ public class NormalConfig {
 
         optimizeFMLRemapper = getBoolean("optimizeFMLRemapper", "remapper", "Optimizing Forge's Remapper for not storing redundant entries", true);
 
-        // optimizeDataStructures = getBoolean("optimizeDataStructures", "datastructures", "Optimizes various data structures around Minecraft", true);
         optimizeRegistries = getBoolean("optimizeRegistries", "datastructures", "Optimizes registries", true);
         optimizeNBTTagCompoundBackingMap = getBoolean("optimizeNBTTagCompoundBackingMap", "datastructures", "Optimize NBTTagCompound's backing map structure", true);
         optimizeFurnaceRecipeStore = getBoolean("optimizeFurnaceRecipeStore", "datastructures", "Optimizing FurnaceRecipes. FastFurnace will see very little benefit when this option is turned on", true);
@@ -133,7 +129,6 @@ public class NormalConfig {
 
         quickerEnableUniversalBucketCheck = getBoolean("quickerEnableUniversalBucketCheck", "misc", "Optimizes FluidRegistry::enableUniversalBucket check", true);
         stripInstancedRandomFromSoundEventAccessor = getBoolean("stripInstancedRandomFromSoundEventAccessor", "misc", "Strips the boring instanced Random object from SoundEventAccessors and uses ThreadLocalRandom instead", true);
-        classCaching = getBoolean("classCaching", "misc", "[W.I.P] - EXPERIMENTAL: Yet another attempt at caching classes between loads", false);
         copyScreenshotToClipboard = getBoolean("copyScreenshotToClipboard", "misc", "Copy image after screenshotting to clipboard", false);
         releaseScreenshotCache = getBoolean("releaseScreenshotCache", "misc", "For some reason Mojang decided to cache int buffers and arrays after a screenshot is taken, this makes sure they're never cached", true);
         asyncScreenshot = getBoolean("asyncScreenshot", "misc", "Process screenshots and print to chat asynchronously", true);
@@ -172,7 +167,9 @@ public class NormalConfig {
         fixMC186052 = getBoolean("fixMC186052", "mcfixes", "Fixes MC-186052: https://bugs.mojang.com/browse/MC-186052", true);
         resolveMC2071 = getBoolean("resolveMC2071", "mcfixes", "Resolves MC-2071: https://bugs.mojang.com/browse/MC-2071", true);
         limitSkinDownloadingThreads = getBoolean("limitSkinDownloadingThreads", "mcfixes", "Limits skin downloading threads to a maximum of half of available CPU cores", true);
+        vfixBugFixes = getBoolean("vfixBugFixes", "mcfixes", "Enables multiple bug fixes from VanillaFix, such as fixing a crash on closing a LAN world and players being invulnerable in portals", true);
 
+        //Not used, only fallback
         furnaceExperienceFCFS = getBoolean("furnaceExperienceFCFS", "furnace", "When optimizeFurnaceRecipeStore is true, experience is determined by who registers the entry first, this is also the fallback option if all three options aren't true", true);
         furnaceExperienceVanilla = getBoolean("furnaceExperienceVanilla", "furnace", "When optimizeFurnaceRecipeStore is true, experience is determined the vanilla way, this method is the most inefficient and random", false);
         furnaceExperienceMost = getBoolean("furnaceExperienceMost", "furnace", "When optimizeFurnaceRecipeStore is true, experience is determined by whichever entry gives the most experience", false);
