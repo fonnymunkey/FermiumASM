@@ -14,6 +14,7 @@ import mirror.normalasm.api.NormalStringPool;
 import mirror.normalasm.config.NormalConfig;
 import mirror.normalasm.NormalLogger;
 import mirror.normalasm.patches.*;
+import net.minecraftforge.fml.common.Loader;
 
 import java.util.*;
 import java.util.function.Function;
@@ -22,18 +23,22 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class NormalTransformer implements IClassTransformer {
 
-    public static boolean isOptifineInstalled;
+    public static boolean isOptifineInstalled = NormalReflector.doesClassExist("optifine.OptiFineForgeTweaker");
+	public static boolean isVintagiumInstalled = Loader.isModLoaded("vintagium");
     public static boolean squashBakedQuads = NormalConfig.instance.squashBakedQuads;
 
     Multimap<String, Function<byte[], byte[]>> transformations;
 
     public NormalTransformer() {
         NormalLogger.instance.info("FermiumASM is now preparing to bytecode manipulate your game.");
-        isOptifineInstalled = NormalReflector.doesClassExist("optifine.OptiFineForgeTweaker");
-        if (squashBakedQuads && isOptifineInstalled) {
-            squashBakedQuads = false;
-            NormalLogger.instance.info("Optifine is installed. BakedQuads won't be squashed as it is incompatible with OptiFine.");
-        }
+		if (isOptifineInstalled || isVintagiumInstalled) {
+			squashBakedQuads = false;
+			if (isOptifineInstalled) {
+				NormalLogger.instance.info("Optifine is installed. BakedQuads won't be squashed as it is incompatible with OptiFine.");
+			} else if (isVintagiumInstalled) {
+				NormalLogger.instance.info("Vintagium is installed. BakedQuads won't be squashed as it is incompatible with Vintagium.");
+			}
+		}
         transformations = MultimapBuilder.hashKeys(30).arrayListValues(1).build();
         if (NormalLoadingPlugin.isClient) {
             // addTransformation("codechicken.lib.model.loader.blockstate.CCBlockStateLoader", bytes -> stripSubscribeEventAnnotation(bytes, "onModelBake", "onTextureStitchPre"));
