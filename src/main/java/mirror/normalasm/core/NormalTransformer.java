@@ -23,6 +23,7 @@ import static org.objectweb.asm.Opcodes.*;
 public class NormalTransformer implements IClassTransformer {
 
     public static boolean isOptifineInstalled;
+	public static boolean isVintagiumInstalled;
     public static boolean squashBakedQuads = NormalConfig.instance.squashBakedQuads;
 
     Multimap<String, Function<byte[], byte[]>> transformations;
@@ -30,10 +31,14 @@ public class NormalTransformer implements IClassTransformer {
     public NormalTransformer() {
         NormalLogger.instance.info("FermiumASM is now preparing to bytecode manipulate your game.");
         isOptifineInstalled = NormalReflector.doesClassExist("optifine.OptiFineForgeTweaker");
-        if (squashBakedQuads && isOptifineInstalled) {
-            squashBakedQuads = false;
-            NormalLogger.instance.info("Optifine is installed. BakedQuads won't be squashed as it is incompatible with OptiFine.");
-        }
+        isVintagiumInstalled = NormalReflector.doesClassExist("me.jellysquid.mods.sodium.client.SodiumMixinTweaker");
+		if (isOptifineInstalled || isVintagiumInstalled) {
+			squashBakedQuads = false;
+			if (isOptifineInstalled)
+                NormalLogger.instance.info("Optifine is installed. BakedQuads won't be squashed as it is incompatible with OptiFine.");
+			if (isVintagiumInstalled)
+				NormalLogger.instance.info("Vintagium is installed. BakedQuads won't be squashed as it is incompatible with Vintagium.");
+		}
         transformations = MultimapBuilder.hashKeys(30).arrayListValues(1).build();
         if (NormalLoadingPlugin.isClient) {
             // addTransformation("codechicken.lib.model.loader.blockstate.CCBlockStateLoader", bytes -> stripSubscribeEventAnnotation(bytes, "onModelBake", "onTextureStitchPre"));
