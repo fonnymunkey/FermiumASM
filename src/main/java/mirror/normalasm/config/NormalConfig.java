@@ -60,7 +60,7 @@ public class NormalConfig {
 
     private Configuration configuration;
 
-    public boolean squashBakedQuads, reuseBucketQuads, autoPopulateCallBakedQuadCtor, autoPopulateExtendBakedQuad;
+    public boolean squashBakedQuads, reuseBucketQuads, autoPopulateCallBakedQuadCtor, autoPopulateExtendBakedQuad, bakedQuadDynaTreeCompat;
     public String[] classesThatCallBakedQuadCtor, classesThatExtendBakedQuad;
     public boolean cleanupLaunchClassLoaderEarly, cleanupLaunchClassLoaderLate, noResourceCache, noClassCache, weakResourceCache, weakClassCache, disablePackageManifestMap, cleanCachesOnGameLoad;
     public boolean resourceLocationCanonicalization, modelConditionCanonicalization, nbtTagStringBackingStringCanonicalization, nbtBackingMapStringCanonicalization, packageStringCanonicalization, lockCodeCanonicalization, spriteNameCanonicalization, asmDataStringCanonicalization, vertexDataCanonicalization, filePermissionsCacheCanonicalization;
@@ -75,7 +75,7 @@ public class NormalConfig {
     public boolean fixMC30845, fixMC31681, fixMC88176, fixMC129057, fixMC129556, fixMC186052, resolveMC2071, limitSkinDownloadingThreads, vfixBugFixes;
     public boolean furnaceExperienceFCFS, furnaceExperienceVanilla, furnaceExperienceMost;
     public boolean makeEventsSingletons;
-    public boolean crashReportImprovements, returnToMainMenuAfterCrash, rewriteLoggingWithDeobfuscatedNames, hideToastsAndContinuePlaying;
+    public boolean crashReportImprovements, crashReportUpdatedScreens, returnToMainMenuAfterCrash, rewriteLoggingWithDeobfuscatedNames, hideToastsAndContinuePlaying;
     public String vanityDeobfuscationName;
 
     private void initialize() {
@@ -90,6 +90,7 @@ public class NormalConfig {
         reuseBucketQuads = getBoolean("reuseBucketQuads", "bakedquad", "Allows bucket models to re-use UnpackedBakedQuads", true);
         autoPopulateCallBakedQuadCtor = getBoolean("autoPopulateCallBakedQuadCtor", "bakedquad", "If disabled, will stop classesThatCallBakedQuadCtor from being automatically populated, for compatibility purposes", true);
         autoPopulateExtendBakedQuad = getBoolean("autoPopulateExtendBakedQuad", "bakedquad", "If disabled, will stop classesThatExtendBakedQuad from being automatically populated, for compatibility purposes", true);
+        bakedQuadDynaTreeCompat = getBoolean("bakedQuadDynaTreeCompat", "bakedquad", "Provide compatibility with Dynamic Trees by automatically adding QuadManipulator to classesThatCallBakedQuadCtor when BakedModelBlockBranchCactus is added (Requires autoPopulateCallBakedQuadCtor to be true)", true);
 
         cleanupLaunchClassLoaderEarly = getBoolean("cleanupLaunchClassLoaderEarly", "launchwrapper", "Cleanup some redundant data structures in LaunchClassLoader at the earliest point possible (when NormalASM is loaded). Helpful for those that don't have enough RAM to load into the game. This can induce slowdowns while loading the game in exchange for more available RAM", false);
         cleanupLaunchClassLoaderLate = getBoolean("cleanupLaunchClassLoaderLate", "launchwrapper", "Cleanup some redundant data structures in LaunchClassLoader at the latest point possible (when the game reaches the Main Screen). This is for those that have enough RAM to load the game and do not want any slowdowns while loading. Note: if 'cleanupLaunchClassLoaderEarly' is 'true', this option will be ignored", true);
@@ -122,7 +123,7 @@ public class NormalConfig {
         replaceSearchTreeWithJEISearching = getBoolean("replaceSearchTreeWithJEISearching", "datastructures", "If JEI/HEI is installed, replace vanilla search trees with JEI's, decreases memory usage, loading time and adds more features to normal creative menu searching", true);
 
         releaseSpriteFramesCache = getBoolean("releaseSpriteFramesCache", "textures", "Releases TextureAtlasSprite's framesTextureData. Won't touch custom TextureAtlasSprite implementations", true);
-        onDemandAnimatedTextures = getBoolean("onDemandAnimatedTextures", "textures", "Calculate and send animated textures only when needed to the GPU, better than VanillaFix's textureFixes config", true);
+        onDemandAnimatedTextures = getBoolean("onDemandAnimatedTextures", "textures", "Calculate and send animated textures only when needed to the GPU. WARNING: Can break modded animated textures, if you are using Optifine you should use Smart Animations instead", false);
 
         optimizeSomeRendering = getBoolean("optimizeSomeRendering", "rendering", "Optimizes some rendering features, not game-breaking; however, negligible at times", true);
         stripUnnecessaryLocalsInRenderHelper = getBoolean("stripUnnecessaryLocalsInRenderHelper", "rendering", "Strip unnecessary locals in RenderHelper::enableStandardItemLighting, no idea why it's there", true);
@@ -177,6 +178,7 @@ public class NormalConfig {
         makeEventsSingletons = getBoolean("makeEventsSingletons", "events", "[EXPERIMENTAL]: Stops mass object creation when Forge is firing events, this can decrease Garbage Collection pressure", false);
 
         crashReportImprovements = getBoolean("crashReportImprovements", "logging", "Allow the game to keep running after crashes as well as adding more information and deobfuscating the crash reports, inspired by VanillaFix", true);
+        crashReportUpdatedScreens = getBoolean("crashReportUpdatedScreens", "logging", "Use the new updated crash report screens, disable to return to the legacy screens", true);
         returnToMainMenuAfterCrash = getBoolean("returnToMainMenuAfterCrash", "logging", "When crashReportImprovements is true, allow the player to return to the main menu when a crash occurs, inspired by VanillaFix", true);
         rewriteLoggingWithDeobfuscatedNames = getBoolean("rewriteLoggingWithDeobfuscatedNames", "logging", "Rewrite logging output with deobfuscated names when applicable, inspired by VanillaFix", true);
         hideToastsAndContinuePlaying = getBoolean("hideToastsAndContinuePlaying", "logging", "When crashReportImprovements is true, disallow toasts from popping up and carry on playing while keeping crashes silent", true);
@@ -193,6 +195,21 @@ public class NormalConfig {
             prop.set(classes.toArray(new String[0]));
             configuration.save();
             NormalLogger.instance.warn("{} added to classesThatCallBakedQuadCtor list in normalasm.cfg", clazz.getName());
+        }
+        if(NormalConfig.instance.bakedQuadDynaTreeCompat) dynaTreeCompatCheck();
+    }
+
+    /**
+     * Hacky but meh
+     */
+    private void dynaTreeCompatCheck() {
+        Property prop = configuration.getCategory("bakedquad").get("classesThatCallBakedQuadCtor");
+        Set<String> classes = new ObjectOpenHashSet<>(prop.getStringList());
+        if (classes.contains("com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchCactus") &&
+                classes.add("com.ferreusveritas.dynamictrees.client.QuadManipulator")) {
+            prop.set(classes.toArray(new String[0]));
+            configuration.save();
+            NormalLogger.instance.warn("BakedQuadDynaTreeCompat corrected classesThatCallBakedQuadCtor list in normalasm.cfg");
         }
     }
 
