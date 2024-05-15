@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 @Mixin(EntityPlayerMP.class)
 public abstract class MixinEntityPlayerMP extends EntityPlayer {
@@ -27,9 +27,9 @@ public abstract class MixinEntityPlayerMP extends EntityPlayer {
      * teleporting the player again (in the other nether portal before the client had the
      * time to confirm the teleport).
      */
-    @Inject(method = "isEntityInvulnerable", at = @At(value = "RETURN"), cancellable = true)
-    private void isEntityInvulnerable(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(super.isEntityInvulnerable(source));
+    @ModifyReturnValue(method = "isEntityInvulnerable", at = @At(value = "RETURN"))
+    private boolean isEntityInvulnerable(boolean original, DamageSource source) {
+        return super.isEntityInvulnerable(source);
     }
 
     /**
