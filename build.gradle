@@ -164,7 +164,6 @@ jar {
                 'FMLCorePluginContainsFMLMod': true,
                 'FMLCorePlugin': "${mixin_loader_class}",
                 'ForceLoadAsMod': project.gradle.startParameter.taskNames[0] == 'build',
-                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
                 'FMLAT': 'normalasm_at.cfg'
         ])
     }
