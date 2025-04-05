@@ -241,7 +241,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
             "mixins.searchtree_mod.json",
             "mixins.modfixes_astralsorcery.json",
             "mixins.capability_astralsorcery.json",
-            "mixins.modfixes_b3m.json"
+            "mixins.modfixes_b3m.json",
+            "mixins.modfixes_railcraft.json"
     );
 
     public static boolean shouldMixinConfigQueueLate(String mixinConfig) {
@@ -265,6 +266,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
                 return NormalConfig.instance.fixAmuletHolderCapability && Loader.isModLoaded("astralsorcery");
             case "mixins.modfixes_b3m.json":
                 return NormalConfig.instance.resourceLocationCanonicalization && Loader.isModLoaded("B3M"); // Stupid
+            case "mixins.modfixes_railcraft.json":
+                return NormalConfig.instance.efficientHashing && Loader.isModLoaded("railcraft");
         }
 
         return false;

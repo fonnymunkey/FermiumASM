@@ -1,5 +1,6 @@
 package mirror.normalasm.core;
 
+import mirror.normalasm.config.NormalConfig;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 public class NormalSpriteMixinPlugin implements IMixinConfigPlugin {
 
-    static boolean logged = false;
+    private Boolean shouldApply;
 
     @Override
     public void onLoad(String s) { }
@@ -23,11 +24,18 @@ public class NormalSpriteMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String s, String s1) {
-        if (!logged) {
-            NormalLogger.instance.error("Optifine is installed. On demand sprites won't be activated as Optifine already has Smart Animations.");
-            logged = true;
+        if (this.shouldApply != null) {
+            return this.shouldApply;
         }
-        return !NormalTransformer.isOptifineInstalled;
+        this.shouldApply = NormalConfig.instance.onDemandAnimatedTextures;
+        
+        if (this.shouldApply) {
+            if (NormalTransformer.isOptifineInstalled) {
+                this.shouldApply = false;
+                NormalLogger.instance.error("Optifine is installed. On demand sprites won't be activated as Optifine already has Smart Animations.");
+            }
+        }
+        return this.shouldApply;
     }
 
     @Override

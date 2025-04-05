@@ -1,0 +1,13 @@
+{
+  "package": "mirror.normalasm.common.modfixes.railcraft.mixins",
+  "refmap": "mixins.normalasm.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ConnectionMapMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
