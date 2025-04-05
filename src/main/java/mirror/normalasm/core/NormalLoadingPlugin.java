@@ -178,8 +178,6 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
                     return NormalConfig.instance.moreModelManagerCleanup;
                 case "mixins.screenshot.json":
                     return NormalConfig.instance.releaseScreenshotCache || NormalConfig.instance.asyncScreenshot;
-                case "mixins.ondemand_sprites.json":
-                    return NormalConfig.instance.onDemandAnimatedTextures;
                 case "mixins.resolve_mc2071.json":
                     return NormalConfig.instance.resolveMC2071;
                 case "mixins.fix_mc_skindownloading.json":

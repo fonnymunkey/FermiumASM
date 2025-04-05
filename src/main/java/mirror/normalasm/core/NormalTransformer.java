@@ -22,8 +22,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class NormalTransformer implements IClassTransformer {
 
-    public static boolean isOptifineInstalled;
-	public static boolean isVintagiumInstalled;
+    public static boolean isOptifineInstalled, isSodiumPortInstalled;
     public static boolean squashBakedQuads = NormalConfig.instance.squashBakedQuads;
 
     Multimap<String, Function<byte[], byte[]>> transformations;
@@ -31,14 +30,16 @@ public class NormalTransformer implements IClassTransformer {
     public NormalTransformer() {
         NormalLogger.instance.info("FermiumASM is now preparing to bytecode manipulate your game.");
         isOptifineInstalled = NormalReflector.doesClassExist("optifine.OptiFineForgeTweaker");
-        isVintagiumInstalled = NormalReflector.doesClassExist("me.jellysquid.mods.sodium.client.SodiumMixinTweaker");
-		if (isOptifineInstalled || isVintagiumInstalled) {
-			squashBakedQuads = false;
-			if (isOptifineInstalled)
+        isSodiumPortInstalled = NormalReflector.doesClassExist("me.jellysquid.mods.sodium.client.SodiumMixinTweaker");
+        if (squashBakedQuads) {
+            if (isOptifineInstalled) {
+                squashBakedQuads = false;
                 NormalLogger.instance.info("Optifine is installed. BakedQuads won't be squashed as it is incompatible with OptiFine.");
-			if (isVintagiumInstalled)
-				NormalLogger.instance.info("Vintagium is installed. BakedQuads won't be squashed as it is incompatible with Vintagium.");
-		}
+            } else if (isSodiumPortInstalled) {
+                squashBakedQuads = false;
+                NormalLogger.instance.info("A sodium port is installed. BakedQuads won't be squashed as it is incompatible with Sodium.");
+            }
+        }
         transformations = MultimapBuilder.hashKeys(30).arrayListValues(1).build();
         if (NormalLoadingPlugin.isClient) {
             // addTransformation("codechicken.lib.model.loader.blockstate.CCBlockStateLoader", bytes -> stripSubscribeEventAnnotation(bytes, "onModelBake", "onTextureStitchPre"));
@@ -142,7 +143,7 @@ public class NormalTransformer implements IClassTransformer {
         if (NormalConfig.instance.fixMC31681) {
             addTransformation("net.minecraft.client.renderer.EntityRenderer", this::fixMC31681);
         }
-        addTransformation("net.minecraft.nbt.NBTTagCompound", bytes -> nbtTagCompound$replaceDefaultHashMap(bytes, NormalConfig.instance.optimizeNBTTagCompoundBackingMap, NormalConfig.instance.nbtBackingMapStringCanonicalization, NormalConfig.instance.optimizeNBTTagCompoundBackingMapOpenMap));
+        addTransformation("net.minecraft.nbt.NBTTagCompound", bytes -> nbtTagCompound$replaceDefaultHashMap(bytes, NormalConfig.instance.optimizeNBTTagCompoundBackingMap, NormalConfig.instance.optimizeNBTTagCompoundMapThreshold, NormalConfig.instance.nbtBackingMapStringCanonicalization));
     }
 
     public void addTransformation(String key, Function<byte[], byte[]> value) {
@@ -467,29 +468,28 @@ public class NormalTransformer implements IClassTransformer {
         return writer.toByteArray();
     }
 
-    private byte[] nbtTagCompound$replaceDefaultHashMap(byte[] bytes, boolean optimizeMap, boolean canonicalizeString, boolean useOpenMap) {
-        if (!optimizeMap && !canonicalizeString) {
+    private byte[] nbtTagCompound$replaceDefaultHashMap(byte[] bytes, boolean optimizeMap, int mapThreshold, boolean canonicalizeString) {
+        if ((!optimizeMap || mapThreshold == 0) && !canonicalizeString) {
             return bytes;
         }
         ClassReader reader = new ClassReader(bytes);
         ClassNode node = new ClassNode();
         reader.accept(node, 0);
-
         for (MethodNode method : node.methods) {
             if (method.name.equals("<init>")) {
                 ListIterator<AbstractInsnNode> iter = method.instructions.iterator();
                 while (iter.hasNext()) {
                     AbstractInsnNode instruction = iter.next();
                     if (instruction.getOpcode() == INVOKESTATIC) {
-                        iter.set(new TypeInsnNode(NEW, useOpenMap ? (canonicalizeString ? "mirror/normalasm/api/datastructures/canonical/AutoCanonizingOpenHashMap" : "it/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap") : (canonicalizeString ? "mirror/normalasm/api/datastructures/canonical/AutoCanonizingArrayMap" : "it/unimi/dsi/fastutil/objects/Object2ObjectArrayMap")));
+                        iter.set(new TypeInsnNode(NEW, "mirror/normalasm/api/datastructures/NormalTagMap"));
                         iter.add(new InsnNode(DUP));
-                        iter.add(new MethodInsnNode(INVOKESPECIAL, useOpenMap ? (canonicalizeString ? "mirror/normalasm/api/datastructures/canonical/AutoCanonizingOpenHashMap" : "it/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap") : (canonicalizeString ? "mirror/normalasm/api/datastructures/canonical/AutoCanonizingArrayMap" : "it/unimi/dsi/fastutil/objects/Object2ObjectArrayMap"), "<init>", "()V", false));
+                        iter.add(new MethodInsnNode(INVOKESPECIAL, "mirror/normalasm/api/datastructures/NormalTagMap", "<init>", "()V", false));
                         break;
                     }
                 }
+                break;
             }
         }
-
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         node.accept(writer);
         return writer.toByteArray();
