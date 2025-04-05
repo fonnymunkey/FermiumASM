@@ -125,7 +125,7 @@ public class NormalConfig {
         replaceSearchTreeWithJEISearching = getBoolean("replaceSearchTreeWithJEISearching", "datastructures", "If JEI/HEI is installed, replace vanilla search trees with JEI's, decreases memory usage, loading time and adds more features to normal creative menu searching", true);
 
         releaseSpriteFramesCache = getBoolean("releaseSpriteFramesCache", "textures", "Releases TextureAtlasSprite's framesTextureData. Won't touch custom TextureAtlasSprite implementations", true);
-        onDemandAnimatedTextures = getBoolean("onDemandAnimatedTextures", "textures", "Calculate and send animated textures only when needed to the GPU. WARNING: Can break modded animated textures, if you are using Optifine you should use Smart Animations instead", false);
+        onDemandAnimatedTextures = getBoolean("onDemandAnimatedTextures", "textures", "Calculate and send animated textures only when needed to the GPU. WARNING: Can break modded animated textures. Disabled when using Optifine as Smart Animations replaces this", false);
 
         optimizeSomeRendering = getBoolean("optimizeSomeRendering", "rendering", "Optimizes some rendering features, not game-breaking; however, negligible at times", true);
         stripUnnecessaryLocalsInRenderHelper = getBoolean("stripUnnecessaryLocalsInRenderHelper", "rendering", "Strip unnecessary locals in RenderHelper::enableStandardItemLighting, no idea why it's there", true);
