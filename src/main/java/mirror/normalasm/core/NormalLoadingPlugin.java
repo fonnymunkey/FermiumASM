@@ -16,7 +16,6 @@ import mirror.normalasm.api.DeobfuscatingRewritePolicy;
 import mirror.normalasm.api.StacktraceDeobfuscator;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
@@ -242,7 +241,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
             "mixins.modfixes_astralsorcery.json",
             "mixins.capability_astralsorcery.json",
             "mixins.modfixes_b3m.json",
-            "mixins.modfixes_railcraft.json"
+            "mixins.modfixes_railcraft.json",
+            "mixins.modfixes_disable_broken_particles.json"
     );
 
     public static boolean shouldMixinConfigQueueLate(String mixinConfig) {
@@ -268,6 +268,8 @@ public class NormalLoadingPlugin implements IFMLLoadingPlugin {
                 return NormalConfig.instance.resourceLocationCanonicalization && Loader.isModLoaded("B3M"); // Stupid
             case "mixins.modfixes_railcraft.json":
                 return NormalConfig.instance.efficientHashing && Loader.isModLoaded("railcraft");
+            case "mixins.modfixes_disable_broken_particles.json":
+                return NormalConfig.instance.disableBrokenParticles;
         }
 
         return false;
